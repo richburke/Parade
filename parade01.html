@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>HTML5 Canvas</title>
+        <link rel="stylesheet" href="assets/styles/main.css" type="text/css" media="screen">
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+        <!--<script src="libs/appv2-1.js"></script>-->
+        <script>
+        /**
+         * - Change/copy images to match card names.
+         * - Represent deck as h13, h12, h11, h10, ... h1
+         * - Create git repo
+         * - Use rally to create stories
+         * - Create stories
+         * - Pick images based upon shuffled deck
+         * - Create simple nodejs server; call it
+         * - Send real data to server
+         * - [DONE] Create data structures for sorting, reporting
+         * - [DONE] Create a method for determining goal state (@objective)
+         * - [DONE] Create algorithm for sorting (@algorithm)
+         * - Write states to file.
+         *   - How far up tree can we go to determine a point from which there
+         *     is no chance of success?
+         * - Implement networked version (@network)
+         * - Add rules (@rules)
+         * 
+         * @objective
+         * - write a data structure that efficiently represents goal state
+         * 
+         * @how-to-play
+         * - The card moved must be of the same suit and 1 less than the card on its left
+         * - A space after a 2 is a dead space
+         * 
+         * @algorithm
+         * - Create a list of spaces.
+         * - Create a list of cards that can be moved, based upon spaces.
+         * - research breadth- versus depth-first algorithm
+         * - write passed data as lightweight as possible
+         * - is there a data structure that is not obvious that allows better searching?
+         * - keep good track of depth of branch
+         * - perhaps use depth-limited searches
+         *   - start restrictive
+         *      - if some, but few successes, try increasing
+         *        until machine can't handle load
+         *      - try to find the optimal point (depth/load -> success)
+         * - reduce recursion as much as possible
+         * 
+         * 
+         * @learning
+         * - write failed snapshot to file
+         *      - check this list when we start a state search
+         * - write succesful snapshot to file and path thereafter for achieving success
+         *   - starting point
+         *   - path to success
+         *      - from this create a complete list of states from which we can be successful
+         *          - check this list when we start a state search
+         * 
+         * 
+         * @network
+         * - Create a config file that specifies
+         *   - the IP address of the machine to use
+         *   - the percentage of load tha user should handle
+         * 
+         * 
+         * @rules
+         * - Rule takes form like this
+         *   {desc:"<desc>", factor:1|-1, scalar: <c>, priority:<x>, fnc:<function>}
+         * 
+         * - Look at both the spot moved to and the spot that is revealed
+         * 
+         * - R: Will it move 2s to the right?  If so, +
+         * - R: Is there a 3 followed by a space higher in array than 2?  If so, +
+         * - R: Is the considered card of the same suit as the ruling suit?  If so, +
+         * - R: Would moving the considered card "reveal" a 2?   If so, -
+         * - R: Is the card considered for moving a 2 at the end of an array?   If so, --!
+         * - R: Is the card considered for moving a 2 at the end of its array?   If so, ---!
+         * - R: Is the card considered for moving a K at the start of an array?   If so, --!
+         * - R: Is the card considered for moving a K at the start of its array?   If so, ---!
+         * - R: Is there a sequence of cards of the same suit followed by a space?  If so, +
+         * - R: Will the card considered by moved to near its ultimate location?  If so, +
+         *      - If so, factor based upon distance
+         * - R: Does card movement reveal a high value card?  If so, +
+         *      - If so, factor based upon value
+         * - R: Does card movement reveal a space for a K?  If so, ++
+         * - R: Does card movement reveal a space for a K at the head of its array?  If so, +++
+         * 
+         * @reporting
+         * - Failure in X moves.  Get average for a given Rules config.
+         * - Success in X moves.  Get average for a given Rules config.
+         * - Average time of state search, by machine.
+         * 
+         * @versions
+         * - ParadeSolver allows user to enter a deck via browser
+         * - Web interface periodically checks server to see what the closest solution
+         *   is thus far, and updates screen.
+         * - Create a meta- program (non-browser; server only) that calls program X
+         *   number of times.   Reports results to file.
+         * - Create a version where the user can select and prioritize the rules that are
+         *   used.
+         * - Implement Rules as Neuralnet.
+         */
+            window.onload = function() {
+                var deck = [
+                "sK", "sQ", "sJ", "s0", "s9", "s8", "s7", "s6", "s5", "s4", "s3", "s2", "sA",  
+                "hK", "hQ", "hJ", "h0", "h9", "h8", "h7", "h6", "h5", "h4", "h3", "h2", "hA",  
+                "dK", "dQ", "dJ", "d0", "d9", "d8", "d7", "d6", "d5", "d4", "d3", "d2", "dA",  
+                "cK", "cQ", "cJ", "c0", "c9", "c8", "c7", "c6", "c5", "c4", "c3", "c2", "cA",  
+                ];
+                
+                var shuffledDeck = [];
+                var index;
+                for (var i=0; i < deck.length; i++) {
+                    index = Math.floor((Math.random()*deck.length)+1) - 1;
+                    shuffledDeck.splice(index, 0, deck[i]);
+                }
+                
+                console.log(shuffledDeck);
+                console.log(shuffledDeck.length);
+                
+                for (var j=0; j < shuffledDeck.length; j++) {
+                    for (var k=0; k < shuffledDeck.length; k++) {
+                        if (j==k) continue;
+                        if (shuffledDeck[k] == shuffledDeck[j])
+                            console.error('DUPLICATE IN DECK! ['+shuffledDeck[k]+']');
+                    }
+                }
+            }
+        </script>
+        
+        <style>
+            #components {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                padding: 0;
+                margin: 0;
+                width: 400px;
+                border-right: groove 4px #333;
+            }
+            #livearea {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                right: 0;
+                left: 401px;
+                overflow: hidden;
+            }
+            #console {
+                position: relative;
+                height: auto;
+                min-height: 400px;
+                background-color: #111;
+                overflow-y: auto;
+                padding: 10px;
+                font-family: monospace;
+                font-size: 14px;
+                color: #CED8F6;
+            }
+            
+            #description {
+                padding: 20px 8px 8px 20px;
+            }
+                #description h1 {
+                    margin-top: 2px;
+                }
+                #description h4 {
+                    color: white;
+                }
+                #description h4.listheading {
+                    margin-bottom: 4px;
+                }
+                #description ol {
+                    margin-top: 0;
+                }
+                #description .summary {
+                    margin-top: 4px;
+                }
+                
+            #Canvas01 {
+                border: none;
+            }
+        </style>
+    </head>
+    <body class="with-controls">
+
+        
+            <!-- flesh out Canvases property of App -->
+            <!-- apply method & property additions from above -->
+            <!-- get the dimensions of a cell at (row:x, col:y)-->
+        <section id="components">
+            <div id="controls">
+                
+            </div>
+            <div id="console">
+                
+            </div>
+            
+            <div id="description">
+                <h1>Grids</h1>
+                <p class="summary">Set up Git and flesh out App JS.</p>
+                            
+                <h4 class="listheading">Next steps</h4>
+                <ol>
+
+                </ol>
+                
+                <p><a href="01-click-in-cell.html">&laquo;&nbsp;Previous</a></p>
+                <p><a href="04_index.html">Dev Path 04 (AI)&nbsp;&raquo;</a></p>
+
+                <!--<p><a href="02-index.html">Dev Path 02 (integrate with back-end)&nbsp;&raquo;</a></p>-->
+            </div>
+        </section>
+        
+        <section id="livearea">
+            <div class="canvasContainer">
+                <canvas id="Canvas01" width="500" height="500">Your browser does not support canvas.</canvas> 
+            </div>
+        </section>
+       
+    </body>
+</html>

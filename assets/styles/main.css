@@ -1,0 +1,24 @@
+body {
+    background-color: black;
+    font-family: Arial, Helvetica, sans-serif;
+}
+h1, li {
+    color: #999;
+}
+h1 {
+    margin-bottom: 2px;
+}
+p {
+    color: white; 
+}
+a {
+   color: yellow;
+}
+.canvasContainer {
+    width:800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+#Canvas01 {
+    border: dashed 1px #999;
+}

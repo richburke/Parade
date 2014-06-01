@@ -1,0 +1,22 @@
+21030222
+_Got the idea that I would write a NodeJS version of a Parade solver.
+
+20130223
+_Implemented it in about 5 hours.  It faces the same problems as the versions
+ I wrote in Lingo, Java and PHP--it runs out of memory.
+ 
+ This first version has been implemented to a have a recursive depth limit. 
+ Curiously, it can do a recursive depth of 14 but not 15; it consistently 
+ fails at 15.
+ 
+ So, if I'm understanding correctly, it can handle 268,435,456 attempts (4^14).
+ But somewhere before achieving 1,073,741,824 attempts (4^15), it fails.
+ 
+20130224
+_Had the idea today that I would 
+  - Move the scoring out of the move() function and into a moveFirst() 
+    function.  That should reduce some overhead.
+  - Add 2 simple rules to determining spaces.  The first is when a space is
+    preceded by a space--do not include it.   The second is when a space is
+    preceded by a 2--do not include it.  This is important and should reduce
+    the number of doomed attempts considerably.

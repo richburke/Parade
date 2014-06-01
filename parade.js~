@@ -1,0 +1,2 @@
+var os_ = require('os');
+console.log('We are running '+process.version+' on a '+os_.type()+'.');
