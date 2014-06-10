@@ -22,4 +22,4 @@ var fs_ = require('fs');
 var __ = require('lodash');
 
 var solver = require('./solver');
-solver.solve();
+solver.run();

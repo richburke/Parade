@@ -14,6 +14,11 @@ var Deck = function() {
     "hK", "hQ", "hJ", "h0", "h9", "h8", "h7", "h6", "h5", "h4", "h3", "h2", "hA",
     "dK", "dQ", "dJ", "d0", "d9", "d8", "d7", "d6", "d5", "d4", "d3", "d2", "dA",
     "cK", "cQ", "cJ", "c0", "c9", "c8", "c7", "c6", "c5", "c4", "c3", "c2", "cA"];
+  var goalState = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, null,
+    13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, null,
+    25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, null,
+    37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, null
+  ];
 
   this.getOrderedDeck = function() {
     return orderedDeck;
@@ -24,6 +29,24 @@ var Deck = function() {
       r.push(cardutils.getByAbbreviation(v));
     });
     return r;
+  };
+  this.getDeckValues = function(deckArray) {
+    var r = [];
+    deckArray.forEach(function(v) {
+      r.push(cardutils.getByAbbreviation(v).value);
+    });
+    return r;
+  };
+  this.isGoalState = function(deckArray) {
+    console.log('in isGoalState');
+    console.log(deckArray);
+    var r = this.getDeckValues(deckArray);
+
+    if (r.length != goalState.length) return false;
+    for (var i=0; i < r.length; i++) {
+      if (r[i] !== goalState[i]) return false;
+    }
+    return true;
   };
   this.hash = function(deckArray) {
     return deckArray.join('');
@@ -59,21 +82,22 @@ var Deck = function() {
   };
   this.determineValidSpaces = function(deckArray, spaceIndices) {
     var spaces = [];
+    var self = this;
 
     spaceIndices.forEach(function(v) {
-      var precedingCard = this.findPrecedingCard(deckArray, v);
+      var precedingCard = self.findPrecedingCard(deckArray, v);
 
       // If the preceding card is 0, it means we're looking at a spot prior
       // to the beginning of the list, so ignore it.
-      if (precedingCard.value === 0)  continue;
+      if (precedingCard.value === 0) return;
 
       // If the preceding card is a space we can't make a move with this
       // space, so ignore it.
-      if (precedingCard.value === null)  continue;
+      if (precedingCard.value === null) return;
 
       // If the preceding card is a 2, we can't make a move with this space,
       // so ignore it.
-      if (precedingCard.ordinal === 2)  continue;
+      if (precedingCard.ordinal === 2) return;
 
       spaces.push(v);
     });
