@@ -33,6 +33,8 @@ var run = function(deckArray) {
     deckArray = deckutils.shuffle();
   }
 
+  deckutils.replaceAces();
+
   q.push(deckArray);
   solve();
 };

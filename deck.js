@@ -64,6 +64,14 @@ var Deck = function() {
     });
     return r;
   };
+  this.replaceAces = function(deckArray) {
+    var a = [];
+    deckArray.forEach(function(v) {
+      a.push(cardutils.isAce(v) ? null : v);
+    });
+    return a;
+  };
+  this.
   this.translateAbbreviationsToValues = function(deckArray) {
     var r = [];
     deckArray.forEach(function(v) {

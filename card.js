@@ -112,6 +112,13 @@ var Card = function() {
     }
     throw new Error();
   };
+  this.isAce = function(p) {
+    if (p === 'sA') return true;
+    if (p === 'hA') return true;
+    if (p === 'dA') return true;
+    if (p === 'cA') return true;
+    return false;
+  };
 };
 
 module.exports = Card;
